@@ -1,8 +1,9 @@
 const fs = require("fs")
-const pluginPath = "/Users/church/itools_plugins"
+const path = require('path');
 const { BrowserWindow, nativeImage, app } = require('electron');
 const clipboardWatcher = require('electron-clipboard-watcher')
 
+const pluginPath = "/Users/church/vscodeProjects/itools_plugins"
 class Plugin {
     constructor(json, absolutePath) {
         this.pluginWindow = null;
@@ -49,10 +50,10 @@ class Plugin {
                 // nodeIntegration: true,
                 webSecurity: false,
                 contextIsolation: false,
-                preload: `${this.absolutePath}/${this.config.appid}/preload.js`
+                preload: `${this.absolutePath}/preload.js`
             }
         });
-        this.pluginWindow.loadURL(`file://${this.absolutePath}/${this.config.appid}/index.html`);
+        this.pluginWindow.loadURL(`file://${this.absolutePath}/index.html`);
 
         this.pluginWindow.on('close', (e) => {
             e.preventDefault();
@@ -93,14 +94,24 @@ class PluginLoader {
         this.pluginsMap = new Map();
         const files = fs.readdirSync(pluginPath)
         files.forEach((item, index) => {
-            let _plguinDir = pluginPath + "/" + item;
-            let config = fs.readFileSync(_plguinDir + "/plugin.json", { encoding: "utf-8" });
-            let pluginClass = new Plugin(config, pluginPath);
-            this.plugins.push(pluginClass);
-            let configJSONObj = JSON.parse(config);
-            configJSONObj.absolutePath = pluginPath;
-            this.pluginConfigs.push(configJSONObj);
-            this.pluginsMap.set(pluginClass.getAppId(), pluginClass);
+            let _plguinDir = path.join(pluginPath, item)
+            //检查某个目录是否存在
+            let stat = fs.statSync(_plguinDir);
+            if (!item.startsWith(".") && stat.isDirectory()) {
+                let pluginJSONPath = path.join(_plguinDir, 'plugin.json');
+                try {
+                    fs.statSync(pluginJSONPath);
+                    let config = fs.readFileSync(pluginJSONPath, { encoding: "utf-8" });
+                    let pluginClass = new Plugin(config, _plguinDir);
+                    this.plugins.push(pluginClass);
+                    let configJSONObj = JSON.parse(config);
+                    configJSONObj.absolutePath = _plguinDir;
+                    this.pluginConfigs.push(configJSONObj);
+                    this.pluginsMap.set(pluginClass.getAppId(), pluginClass);
+                } catch (e) {
+                    console.error(e);
+                }
+            }
         })
     }
 

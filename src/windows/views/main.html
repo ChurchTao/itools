@@ -43,7 +43,7 @@
       let allPluginsDom = '';
       allPlugins.forEach((item) => {
         let pluginDom = `<div class="item" onclick="openApp('${item.appid}')">
-                          <img class="app-icon" src="${item.absolutePath}/${item.appid}/${item.logo}" />
+                          <img class="app-icon" src="${item.absolutePath}/${item.logo}" />
                           <div clss="app-name">${item.name}</div>
                         </div>`;
         allPluginsDom += pluginDom;
