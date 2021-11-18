@@ -1,0 +1,27 @@
+{
+  "name": "itools",
+  "version": "1.0.0",
+  "description": "An Electron application for devtools",
+  "main": "src/main.js",
+  "scripts": {
+    "dev": "electron src/main.js",
+    "start": "electron src/main.js",
+    "build:mac": "./scripts/build.sh darwin x64"
+  },
+  "repository": {},
+  "keywords": [
+    "Electron",
+    "itools",
+    "devtools"
+  ],
+  "dependencies": {
+    "electron": "15.3.0",
+    "electron-clipboard-watcher": "^1.0.1",
+    "electron-localshortcut": "3.2.1",
+    "nconf": "0.11.3",
+    "pinyin": "2.10.2"
+  },
+  "devDependencies": {
+    "electron-packager": "15.4.0"
+  }
+}

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <!-- https://developer.mozilla.org/en-US/docs/Web/HTTP/CSP -->
+  <!-- <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'"> -->
+  <link href="../styles/styles.css" rel="stylesheet">
+  <link rel="stylesheet" href="../styles/main/iconfont.css">
+  <link rel="stylesheet" href="../styles/main/main_window.css">
+  <title>iTools</title>
+</head>
+
+<body>
+  <div class="title-bar">
+    <div></div>
+    <div>iTools</div>
+    <div class="iconfont icon-setting"></div>
+  </div>
+  <div class="body-win">
+    <div class="search">
+      <input class="search-input" type="text" placeholder="请输入搜索内容">
+    </div>
+    <div id="app-box" class="app-box">
+    </div>
+  </div>
+
+  <script>
+    const { ipcRenderer } = require('electron')
+
+    function $(id) {
+      return document.getElementById(id);
+    }
+    function openApp(appid) {
+      ipcRenderer.send('openPlugins', appid);
+    }
+    function renderAllPlugins() {
+      ipcRenderer.send('getAllPlugins', 'ping');
+    }
+
+    ipcRenderer.on('getAllPlugins-reply', (event, arg) => {
+      let allPlugins = arg;
+      let allPluginsDom = '';
+      allPlugins.forEach((item) => {
+        let pluginDom = `<div class="item" onclick="openApp('${item.appid}')">
+                          <img class="app-icon" src="${item.absolutePath}/${item.appid}/${item.logo}" />
+                          <div clss="app-name">${item.name}</div>
+                        </div>`;
+        allPluginsDom += pluginDom;
+      })
+      $("app-box").innerHTML = allPluginsDom;
+    })
+    renderAllPlugins();
+
+  </script>
+</body>
+
+</html>
